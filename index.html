@@ -1,0 +1,207 @@
+<html>
+<head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.playSound.js"></script>
+<style type="text/css">
+	html { background-color: #000; }
+	html, body { margin: 0; padding: 0; color: #ccc; font-family: Verdana, Geneva, sans-serif; }
+	
+	#status { height: 300px; width: 100%; }
+	#error-list { margin: auto; text-align: center; list-style: none; padding: 0; margin-top: 30px; }
+	
+	#status.ok { background: url(ok.png) no-repeat center; display: none; }
+	#status.down { background: url(down.png) no-repeat center; }
+	
+	.larger { font-size: 130%; color: #fff; }
+	.lighter { color: #666; }
+	
+	#cameras-right { position: absolute; top: 0; right: 0; width: 320px; }
+	#cameras-left { position: absolute; top: 0; left: 0; width: 320px; }
+	
+	#clock { text-align: center; padding: 60px 0; }
+	#time { font-size: 400%; }
+	#date { font-size: 200%; }
+	
+	.twtr-widget .twtr-doc .twtr-bd .twtr-timeline .twtr-tweets { font-size: 18px; }
+	
+</style>
+
+<script type="text/javascript">
+	String.prototype.pad = function(l, s, t) {
+		return s || (s = " "), (l -= this.length) > 0 ? 
+		(s = new Array(Math.ceil(l / s.length) 
+		+ 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
+		+ this + s.substr(0, l - t) : this;
+	};
+	
+	function secondsToTime(secs)
+	{
+		var hours = Math.floor(secs / (60 * 60));
+	   
+		var divisor_for_minutes = secs % (60 * 60);
+		var minutes = Math.floor(divisor_for_minutes / 60);
+	 
+		var divisor_for_seconds = divisor_for_minutes % 60;
+		var seconds = Math.ceil(divisor_for_seconds);
+	   
+		var obj = {
+			"h": hours,
+			"m": minutes,
+			"s": seconds
+		};
+		return obj;
+	}
+	
+	function compareResponse(a,b) {
+	  if (a.lastresponsetime < b.lastresponsetime)
+		 return -1;
+	  if (a.lastresponsetime > b.lastresponsetime)
+		return 1;
+	  return 0;
+	}	
+		
+	function doChecks() {
+		$.ajax({
+			url: 'actions/get-checks.php',
+			dataType: 'json',
+			type: 'GET',
+			success: function(data) {
+				var bolAllOK = true;
+				$('#error-list').html('');
+				for (var i = 0; i < data.checks.length; i++) {
+					var check = data.checks[i];
+					if (check.status != "up") {
+						bolAllOK = false;
+						var currentTime = new Date();
+						var timeDown = secondsToTime(Math.round(currentTime.getTime() / 1000) - check.lasterrortime);
+						var timeString = "";
+						if (timeDown.h > 0) {
+							timeString = timeDown.h + "h";
+						} else if (timeDown.m > 0) {
+							timeString = timeDown.m + "m";
+					    } else {
+							timeString = timeDown.s + "s";
+					    }
+						$('#error-list').append('<li><span class="larger">' + check.name + '</span></li>');
+					}
+				}
+				
+				if (bolAllOK) {
+					$('#status').addClass('ok').removeClass('down');
+					$('.twtr-timeline').height(600);
+					$('.soundplayer').remove();
+					$('html').css({'background-color': '#000'}).stop();
+				} else {
+					$('.twtr-timeline').height(300);
+					$('#status').addClass('down').removeClass('ok');
+					if (!$('.soundplayer').length) {
+						$.playSound('BEEP1A.WAV');
+					}
+					strobeBG();
+				}
+			},
+			error: function() {
+				$('#status').addClass('down').removeClass('ok');
+				$('#error-list').html('<li><span class="larger">Unable to connect to Pingdom</span></li>');
+			}
+		});
+	}
+	
+	function strobeBG() {
+		$('html').css({'background-color': '#000'}).stop();
+		$('html').animate({
+		    backgroundColor: '#f00'
+		}, 3000, function() {
+			$('html').animate({
+				backgroundColor: '#000'
+			}, 3000, function() {
+				strobeBGWrap();
+			});
+		});
+	}
+	
+	function strobeBGWrap() {
+		strobeBG();
+	}
+	
+	function updateCameras() {
+		$('.camera').each(function() {
+			var url = $(this).attr('src').split('?')[0];
+			$(this).attr('src', url + '?' + Math.random());
+		})
+	}
+	
+	function updateTime() {
+		xN = new Date();
+		xH = xN.getHours().toString().pad(2,'0',0);
+		xM = xN.getMinutes().toString().pad(2,'0',0);
+		xS = xN.getSeconds().toString().pad(2,'0',0);
+		xD = xN.getDate().toString().pad(2,'0',0);
+		xMo = (xN.getMonth() + 1).toString().pad(2,'0',0);
+		xY = xN.getFullYear().toString();
+		$('#clock').html('<div id="time">' + xH + ':' + xM + ':' + xS + '</div><div id="date">' + xD + '/' + xMo + '/' + xY + '</div>');
+	}
+
+	$(document).ready(function() {
+	    doChecks();
+		setInterval("doChecks()", 10000);
+		//setInterval("updateCameras()", 1000); //Uncomment to enable cameras
+		setInterval("updateTime()", 1000);
+	});
+</script>
+</head>
+
+
+<body>
+<!-- #Uncomment to enable cameras
+	<div id="cameras-right">
+    	<img src="http://cam1/record/current.jpg?1" width="320" height="240" class="camera" />
+        <img src="http://cam2/record/current.jpg?1" width="320" height="240" class="camera" />
+        <div id="clock">
+        
+        </div>
+    </div>
+    <div id="cameras-left">
+    	<img src="http://cam3/record/current.jpg?1" width="320" height="240" class="camera" />
+        <img src="http://cam4/record/current.jpg?1" width="320" height="240" class="camera" />
+        <img src="http://cam5/record/current.jpg?1" width="320" height="240" class="camera" />
+    </div>
+-->
+	<div id="status"></div>
+    <ul id="error-list"></ul>
+    <div id="ticker">
+		<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+        <script>
+        new TWTR.Widget({
+          version: 2,
+          type: 'list',
+          rpp: 30,
+          interval: 30000,
+          title: '',
+          subject: '',
+          width: 'auto',
+          height: 600,
+          theme: {
+            shell: {
+              background: '#000000',
+              color: '#ffffff'
+            },
+            tweets: {
+              background: '#383738',
+              color: '#ffffff',
+              links: '#e39000'
+            }
+          },
+          features: {
+            scrollbar: false,
+            loop: true,
+            live: true,
+            behavior: 'all'
+          }
+        }).render().setList('SurreyIT', 'screentweets').start();
+        </script>    
+    </div>
+</body>
+
+</html>
