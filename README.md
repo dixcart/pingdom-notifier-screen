@@ -1,14 +1,14 @@
-#pingdom-notifier-screen
+#pingdom-notifier-screen v2
 
-A simple pingdom based notification screen including support for 5 webcams.
+A simple pingdom based notification screen.
 
 ##Setup
 
 Copy to a PHP webserver somewhere, and edit `inc/settings.inc.php` to include your Pingdom username and password.
 
-If you have webcams that allow you to pull off images on demand, just replace the urls in `cameras-right` and `cameras-left` for your camera's urls and uncomment where noted.  The Javascript will add a random querystring to beat your browser's cache.
+##Customising
 
-Twitter section is from a list on our own twitter, just modify line 212 of `index.html` to use your own list.
+Comes with 2 CSS styles, add `?class=icons` to the URL for a different look.
 
 ##License
 
