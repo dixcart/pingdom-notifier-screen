@@ -1,0 +1,44 @@
+html, body { background-color: #222222; padding-bottom: 50px; }
+
+body { font-family: Segoe UI, Tahoma, Verdana, sans-serif; padding-bottom: 50px; }
+
+h1 { font-size: 18px; display: inline-block; }
+
+.clear { clear: both; }
+
+#base-server,
+#base-module,
+#base-misc { display: none; }
+
+	.panel { float: left; border: 1px solid #999; background-repeat: repeat; padding: 20px; margin: 5px; position: relative; border-radius: 3px; overflow: hidden; height: 20px; vertical-align: middle; }
+	.panel.favourite { width: 330px; }
+	.panel { background: #707070; }
+	.panel.up { background: #19A319; }
+	.panel.down { background: #B20000; }
+	.panel.unconfirmed_down { background: #FFB84D; }
+	.panel.unknown { background: #707070; }
+	.panel.paused { background: #80B2FF; }
+
+		.panel h1 { margin: 0; color: #fff; }
+		.panel.up h1 { color: #333; }
+		.panel.down h1 { font-size: 300%; margin-top: -18px; }
+
+	.icons .panel { background-image:  url(../images/low_contrast_linen.png); padding-right: 55px; }
+	.icons .panel.up { background-image:  url(../images/frenchstucco.png); }
+			.icons .panel .status { height: 48px; width: 48px; position: absolute; top: 5px; right: 0; }
+			.icons .panel .status { background-image: url(../images/icons/status_unknown.png); }
+			.icons .panel.up .status { background-image: url(../images/icons/status_up.png); }
+			.icons .panel.down .status { background-image: url(../images/icons/status_down.png); }
+			.icons .panel.unconfirmed_down .status { background-image: url(../images/icons/status_warn.png); }
+			.icons .panel.unknown .status { background-image: url(../images/icons/status_unknown.png); }
+			.icons .panel.paused .status { background-image: url(../images/icons/status_paused.png); }
+
+#footer-bar { position: fixed; width: 100%; bottom: 0; }
+	#footer-bar-inner { position: relative; background:  #fff url(../images/clean_textile.png) repeat; width: 80%; margin: 0 auto; padding: 10px 0; text-align: center; border-top-left-radius: 3px; border-top-right-radius: 3px; border: 1px solid #999; z-index: 999; border-bottom: 0; }
+		#footer-bar-inner #total-calls { background: url(../images/icons/telephone.png) no-repeat left; padding-left: 18px; display: inline-block; }
+		#footer-bar-inner #time-variance { background: url(../images/icons/time.png) no-repeat left; padding-left: 18px; display: inline-block; margin-left: 10px; }
+		#footer-bar-inner #versions { background: url(../images/icons/server_compressed.png) no-repeat left; padding-left: 18px; display: inline-block; margin-left: 10px; }
+		#footer-bar-inner #menu-toggle { position: absolute; bottom: 2px; right: 0; }
+		#footer-bar-inner #menu { bottom: 20px; position: absolute; right: 0; display: none; }
+
+pre.server-response { font-size: 80%; }
